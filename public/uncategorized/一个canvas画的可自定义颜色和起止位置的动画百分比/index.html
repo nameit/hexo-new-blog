@@ -1,0 +1,755 @@
+<!doctype html>
+<html class="theme-next use-motion ">
+<head><meta name="generator" content="Hexo 3.9.0">
+    
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5">
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.4">
+
+
+
+
+  <meta name="keywords" content="canvas,百分比,">
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.4">
+
+
+<meta name="description" content="说明一个简单的用canvas画的可自定义颜色和起止位置的动画百分比 –&amp;gt;先看效果&amp;lt;–      // call function     $(&apos;.clickme&apos;).click(function(){         function PercentageAnimation(element, options) {     var canvas = $(element),">
+<meta name="keywords" content="canvas,百分比">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自定义起止位置的canvas动画百分比">
+<meta property="og:url" content="http://yoursite.com/uncategorized/一个canvas画的可自定义颜色和起止位置的动画百分比/index.html">
+<meta property="og:site_name" content="Freeman">
+<meta property="og:description" content="说明一个简单的用canvas画的可自定义颜色和起止位置的动画百分比 –&amp;gt;先看效果&amp;lt;–      // call function     $(&apos;.clickme&apos;).click(function(){         function PercentageAnimation(element, options) {     var canvas = $(element),">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-09-04T07:42:29.334Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自定义起止位置的canvas动画百分比">
+<meta name="twitter:description" content="说明一个简单的用canvas画的可自定义颜色和起止位置的动画百分比 –&amp;gt;先看效果&amp;lt;–      // call function     $(&apos;.clickme&apos;).click(function(){         function PercentageAnimation(element, options) {     var canvas = $(element),">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: '',
+    sidebar: 'post'
+  };
+</script>
+
+    <title> 自定义起止位置的canvas动画百分比 // Freeman </title>
+</head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+
+
+
+<div class="container one-column page-post-detail">
+    <div class="headband"></div>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">Freeman</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-home"></i> <br>
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-categories"></i> <br>
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-archives"></i> <br>
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-tags"></i> <br>
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+        </div>
+    </header>
+
+    <main id="main" class="main">
+        <div class="main-inner">
+            <div id="content" class="content">
+                
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              自定义起止位置的canvas动画百分比
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2020-09-04T15:42:29+08:00" content="2020-09-04">
+            2020-09-04
+          </time>
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p>一个简单的用canvas画的可自定义颜色和起止位置的动画百分比</p>
+<p><b class="clickme" style="cursor: pointer;vertical-align: top;color: blue;">–&gt;先看效果&lt;–</b><canvas width="190" height="170" class="aaa"></canvas><canvas width="190" height="170" class="bbb"></canvas><canvas width="190" height="170" class="ccc"></canvas></p>
+<script src="/vendors/jquery/index.js"></script>
+<script>
+
+  // call function
+    $('.clickme').click(function(){
+        function PercentageAnimation(element, options) {
+    var canvas = $(element),
+        cWidth = canvas[0].width,
+        cHeight = canvas[0].height;
+    this.options = $.extend({}, $.fn.percentageAnimation.defaults, options);
+    this.canvas = canvas;
+    this.cWidth = canvas[0].width;
+    this.cHeight = canvas[0].height;
+    this.init();
+}
+PercentageAnimation.prototype = {
+    init: function() {
+        var drawingStaff,
+            num,
+            endArc,
+            arcIncrements = 0,
+            difference = this.options.roundStartDegree - this.options.roundEndDegree,
+            actureDegree = difference > 0 ? 360 - difference : Math.abs(difference),
+            that = this,
+            cxt = this.canvas[0].getContext('2d');
+        endArc = this.options.percentage * actureDegree * Math.PI / 180;
+        drawingStaff = setInterval(function() {
+            arcIncrements += Math.PI / 180;
+            that.drawCanvasStaff(cxt, arcIncrements, actureDegree);
+            if (arcIncrements > endArc) {
+                clearInterval(drawingStaff);
+            };
+        }, this.options.speed)
+    },
+    drawCanvasStaff: function(cxt, arcEndStaff, actureDegree) {
+        var text,
+            textWidth;
+        this.drawCanvasRound(cxt, this.options.baseColor, this.options.roundStartDegree * Math.PI / 180, this.options.roundEndDegree * Math.PI / 180);
+
+        // draw cover round
+        cxt.beginPath();
+        cxt.strokeStyle = this.options.coverColor;
+        cxt.lineWidth = this.options.lineWidth;
+        cxt.lineCap = this.options.shape;
+        cxt.arc(this.cWidth / 2, this.cHeight / 2, this.options.radius, this.options.coverStartDegree * Math.PI / 180, arcEndStaff - (actureDegree - this.options.roundEndDegree) * Math.PI / 180, false);
+        cxt.stroke();
+
+        // draw text
+        cxt.fillStyle = this.options.coverColor;
+        cxt.font = this.options.numberFont;
+        text = Math.floor(arcEndStaff / (actureDegree * Math.PI / 180) * 100);
+        textWidth = cxt.measureText(text).width;
+        cxt.fillText(text, this.cWidth / 2 - textWidth / 2, this.cHeight / 2 + 20);
+        cxt.font = this.options.subFont;
+        cxt.fillStyle = '#ccc';
+        cxt.fillText(this.options.subtitle, this.cWidth / 2 + textWidth / 2, this.cHeight / 2 + 20);
+
+    },
+    // draw basic round
+    drawCanvasRound: function(cxt, color, sAngle, eAngle) {
+        cxt.clearRect(0, 0, this.cWidth, this.cHeight);
+
+        cxt.beginPath();
+        cxt.strokeStyle = color;
+        cxt.lineWidth = this.options.lineWidth;
+        cxt.arc(this.cWidth / 2, this.cHeight / 2, this.options.radius, sAngle, eAngle, false);
+        cxt.stroke();
+    }
+}
+$.fn.percentageAnimation = function(options) {
+    return this.each(function() {
+        new PercentageAnimation(this, options)
+    });
+}
+$.fn.percentageAnimation.defaults = {
+    baseColor: '#e1e1e1',
+    coverColor: '#e45050',
+    lineWidth: 6,
+    percentage: 0.8,
+    roundStartDegree: 0,
+    roundEndDegree: 360,
+    coverStartDegree: 0,
+    radius: 80,
+    speed: 10, //the more the slower
+    shape: 'round', //square\butt\round
+    subtitle: '分',
+    numberFont: '60px Microsoft YaHei',
+    subFont: '18px PT Sans'
+}
+        $('.aaa').percentageAnimation();
+        $('.bbb').percentageAnimation({
+            percentage: 0.5,
+            roundStartDegree : 135,
+            roundEndDegree : 45,
+            coverStartDegree : 135,
+            numberFont : '54px songti',
+            coverColor : 'green'
+        })
+        $('.ccc').percentageAnimation({
+            percentage: 0.2,
+            subtitle : '%',
+            shape : 'square',
+            roundStartDegree : 90,
+            roundEndDegree : 270,
+            coverStartDegree : 90,
+            coverColor : 'blue',
+            speed: 50,
+            lineWidth: 10
+        })
+    })
+</script>
+
+
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th style="text-align:right">默认值</th>
+<th style="text-align:right">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseColor</td>
+<td style="text-align:right">#e1e1e1</td>
+<td style="text-align:right">底部圆颜色</td>
+</tr>
+<tr>
+<td>coverColor</td>
+<td style="text-align:right">#45050</td>
+<td style="text-align:right">动画圆颜色</td>
+</tr>
+<tr>
+<td>lineWidth</td>
+<td style="text-align:right">6</td>
+<td style="text-align:right">圆宽</td>
+</tr>
+<tr>
+<td>percentage</td>
+<td style="text-align:right">0.8</td>
+<td style="text-align:right">百分比</td>
+</tr>
+<tr>
+<td>roundStartDegree</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">底部圆结束度数</td>
+</tr>
+<tr>
+<td>roundEndDegree</td>
+<td style="text-align:right">360</td>
+<td style="text-align:right">底部圆结束度数</td>
+</tr>
+<tr>
+<td>coverStartDegree</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">动画圆开始度数</td>
+</tr>
+<tr>
+<td>radius</td>
+<td style="text-align:right">80</td>
+<td style="text-align:right">半径</td>
+</tr>
+<tr>
+<td>speed</td>
+<td style="text-align:right">10</td>
+<td style="text-align:right">动画速度</td>
+</tr>
+<tr>
+<td>shape</td>
+<td style="text-align:right">round</td>
+<td style="text-align:right">动画圆边角形状</td>
+</tr>
+<tr>
+<td>subtitle</td>
+<td style="text-align:right">分</td>
+<td style="text-align:right">辅助文字</td>
+</tr>
+<tr>
+<td>numberFont</td>
+<td style="text-align:right">60px Microsoft YaHei</td>
+<td style="text-align:right">数字字体</td>
+</tr>
+<tr>
+<td>subFont</td>
+<td style="text-align:right">18px PT Sans</td>
+<td style="text-align:right">辅助字体</td>
+</tr>
+</tbody>
+</table>
+<h2 id="计算度数和弧度"><a href="#计算度数和弧度" class="headerlink" title="计算度数和弧度"></a>计算度数和弧度</h2><p>知道起止度数，计算实际静止圆的度数：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">difference = <span class="keyword">this</span>.<span class="keyword">options</span>.roundStartDegree - <span class="keyword">this</span>.<span class="keyword">options</span>.roundEndDegree,</span><br><span class="line">actureDegree = difference &gt; <span class="number">0</span> ? <span class="number">360</span> - difference : Math.<span class="keyword">abs</span>(difference),</span><br></pre></td></tr></table></figure></p>
+<p>知道实际静止圆的度数和百分比算出动画圆的结束弧度<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">endArc</span> = this.options.percentage * actureDegree * Math.PI / <span class="number">180</span><span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h2><p>jQuery</p>
+<h2 id="调用"><a href="#调用" class="headerlink" title="调用"></a>调用</h2><p>例如：<br><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$(</span><span class="string">'.aaa'</span>).percentageAnimation(&#123;  </span><br><span class="line">    <span class="symbol">speed:</span> <span class="number">20</span>  </span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<h2 id="Git地址"><a href="#Git地址" class="headerlink" title="Git地址"></a>Git地址</h2><p><a href="https://github.com/nameit/percentageAnimation" target="_blank" rel="noopener">percentageAnimation项目地址</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/canvas/" rel="tag">#canvas</a>
+          
+            <a href="/tags/百分比/" rel="tag">#百分比</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/uncategorized/package.json部分知识/" rel="prev">pacakge.json部分知识理解</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/uncategorized/windows自定义bash的alias/" rel="next">windows自定义bash的alias</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+            </div>
+
+            
+
+            
+              <div class="comments" id="comments">
+                
+              </div>
+            
+        </div>
+
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="Yuki" itemprop="image">
+          <p class="site-author-name" itemprop="name">Yuki</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description"></p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#说明"><span class="nav-number">1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">2.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#计算度数和弧度"><span class="nav-number">3.</span> <span class="nav-text">计算度数和弧度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖"><span class="nav-number">4.</span> <span class="nav-text">依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调用"><span class="nav-number">5.</span> <span class="nav-text">调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git地址"><span class="nav-number">6.</span> <span class="nav-text">Git地址</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="copyright">
+  
+  &copy; &nbsp; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yuki</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT
+  </a>
+</div>
+
+
+
+        </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+</div>
+
+<script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+    
+
+  
+
+
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.4"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.4"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.4" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.4" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      if (isDesktop() && CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    });
+  </script>
+
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (CONFIG.sidebar === 'always') {
+            displaySidebar();
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+<!-- lazyload -->
+<script type="text/javascript" src="/js/lazyload.js"></script>
+<script type="text/javascript">
+    jQuery(function () {
+        jQuery("#posts img").lazyload({
+            placeholder: "/images/loading.gif",
+            effect: "fadeIn"
+        });
+    });
+</script>
+</body>
+</html>

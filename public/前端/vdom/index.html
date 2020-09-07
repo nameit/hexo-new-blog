@@ -1,0 +1,603 @@
+<!doctype html>
+<html class="theme-next use-motion ">
+<head><meta name="generator" content="Hexo 3.9.0">
+    
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5">
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.4">
+
+
+
+
+  <meta name="keywords" content="vdom,">
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.4">
+
+
+<meta name="description" content="虚拟dom的样子1、原生dom 123&amp;lt;div class=&quot;outer&quot; id=&quot;app&quot;&amp;gt;    &amp;lt;div class=&quot;inner&quot;&amp;gt;内部&amp;lt;/div&amp;gt;&amp;lt;/div&amp;gt; 2、虚拟dom 1234567891011121314vnode = &amp;#123;    tag: &apos;div&apos;,    data: &amp;#123;        class: &apos;out">
+<meta name="keywords" content="vdom">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简易虚拟dom原理">
+<meta property="og:url" content="http://yoursite.com/前端/vdom/index.html">
+<meta property="og:site_name" content="Freeman">
+<meta property="og:description" content="虚拟dom的样子1、原生dom 123&amp;lt;div class=&quot;outer&quot; id=&quot;app&quot;&amp;gt;    &amp;lt;div class=&quot;inner&quot;&amp;gt;内部&amp;lt;/div&amp;gt;&amp;lt;/div&amp;gt; 2、虚拟dom 1234567891011121314vnode = &amp;#123;    tag: &apos;div&apos;,    data: &amp;#123;        class: &apos;out">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://image-static.segmentfault.com/408/885/4088852130-5afbe6c95934b_articlex">
+<meta property="og:updated_time" content="2020-09-04T02:56:58.995Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="简易虚拟dom原理">
+<meta name="twitter:description" content="虚拟dom的样子1、原生dom 123&amp;lt;div class=&quot;outer&quot; id=&quot;app&quot;&amp;gt;    &amp;lt;div class=&quot;inner&quot;&amp;gt;内部&amp;lt;/div&amp;gt;&amp;lt;/div&amp;gt; 2、虚拟dom 1234567891011121314vnode = &amp;#123;    tag: &apos;div&apos;,    data: &amp;#123;        class: &apos;out">
+<meta name="twitter:image" content="https://image-static.segmentfault.com/408/885/4088852130-5afbe6c95934b_articlex">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: '',
+    sidebar: 'post'
+  };
+</script>
+
+    <title> 简易虚拟dom原理 // Freeman </title>
+</head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+
+
+
+<div class="container one-column page-post-detail">
+    <div class="headband"></div>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">Freeman</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-home"></i> <br>
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-categories"></i> <br>
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-archives"></i> <br>
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-tags"></i> <br>
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+        </div>
+    </header>
+
+    <main id="main" class="main">
+        <div class="main-inner">
+            <div id="content" class="content">
+                
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              简易虚拟dom原理
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2020-09-04T10:56:58+08:00" content="2020-09-04">
+            2020-09-04
+          </time>
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing"><a href="/categories/前端/" itemprop="url" rel="index"><span itemprop="name">前端</span></a></span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="虚拟dom的样子"><a href="#虚拟dom的样子" class="headerlink" title="虚拟dom的样子"></a>虚拟dom的样子</h2><p>1、原生dom</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"outer"</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"inner"</span>&gt;</span>内部<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>2、虚拟dom</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">vnode = &#123;</span><br><span class="line">    tag: <span class="string">'div'</span>,</span><br><span class="line">    data: &#123;</span><br><span class="line">        class: 'outer',</span><br><span class="line">        id: <span class="string">'app'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    children: [&#123;</span><br><span class="line">        tag: <span class="string">'div'</span>,</span><br><span class="line">        data: &#123;</span><br><span class="line">            class: 'inner'</span><br><span class="line">        &#125;,</span><br><span class="line">        children: <span class="string">'内部'</span></span><br><span class="line">    &#125;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="什么是虚拟dom"><a href="#什么是虚拟dom" class="headerlink" title="什么是虚拟dom"></a>什么是虚拟dom</h2><p>为了避免过多操作原生dom，用js模拟dom树结构的一个对象。</p>
+<h2 id="js操作原生dom为什么开销大"><a href="#js操作原生dom为什么开销大" class="headerlink" title="js操作原生dom为什么开销大"></a>js操作原生dom为什么开销大</h2><blockquote>
+<p>因为浏览器渲染dom树的引擎和 js引擎是分开的，如果通过js操作dom这些跨引擎的通讯增加了成本，以及 dom 操作引起的浏览器的回流和重绘，使得性能开销巨大，原本在 pc 端是没有性能问题的，因为 pc 的计算能力强，但是随着移动端的发展，越来越多的网页在智能手机上运行，而手机的性能参差不齐，会有性能问题。</p>
+</blockquote>
+<ul>
+<li><p>随便新建一个div，它的属性就有如下这么多：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"align, title, lang, translate, dir, hidden, accessKey, draggable, spellcheck, autocapitalize, contentEditable, isContentEditable, inputMode, offsetParent, offsetTop, offsetLeft, offsetWidth, offsetHeight, style, innerText, outerText, oncopy, oncut, onpaste, onabort, onblur, oncancel, oncanplay, oncanplaythrough, onchange, onclick, onclose, oncontextmenu, oncuechange, ondblclick, ondrag, ondragend, ondragenter, ondragleave, ondragover, ondragstart, ondrop, ondurationchange, onemptied, onended, onerror, onfocus, oninput, oninvalid, onkeydown, onkeypress, onkeyup, onload, onloadeddata, onloadedmetadata, onloadstart, onmousedown, onmouseenter, onmouseleave, onmousemove, onmouseout, onmouseover, onmouseup, onmousewheel, onpause, onplay, onplaying, onprogress, onratechange, onreset, onresize, onscroll, onseeked, onseeking, onselect, onstalled, onsubmit, onsuspend, ontimeupdate, ontoggle, onvolumechange, onwaiting, onwheel, onauxclick, ongotpointercapture, onlostpointercapture, onpointerdown, onpointermove, onpointerup, onpointercancel, onpointerover, onpointerout, onpointerenter, onpointerleave, onselectstart, onselectionchange, dataset, nonce, tabIndex, click, focus, blur, enterKeyHint, onformdata, onpointerrawupdate, attachInternals, namespaceURI, prefix, localName, tagName, id, className, classList, slot, part, attributes, shadowRoot, assignedSlot, innerHTML, outerHTML, scrollTop, scrollLeft, scrollWidth, scrollHeight, clientTop, clientLeft, clientWidth, clientHeight, attributeStyleMap, onbeforecopy, onbeforecut, onbeforepaste, onsearch, previousElementSibling, nextElementSibling, children, firstElementChild, lastElementChild, childElementCount, onfullscreenchange, onfullscreenerror, onwebkitfullscreenchange, onwebkitfullscreenerror, setPointerCapture, releasePointerCapture, hasPointerCapture, hasAttributes, getAttributeNames, getAttribute, getAttributeNS, setAttribute, setAttributeNS, removeAttribute, removeAttributeNS, hasAttribute, hasAttributeNS, toggleAttribute, getAttributeNode, getAttributeNodeNS, setAttributeNode, setAttributeNodeNS, removeAttributeNode, closest, matches, webkitMatchesSelector, attachShadow, getElementsByTagName, getElementsByTagNameNS, getElementsByClassName, insertAdjacentElement, insertAdjacentText, insertAdjacentHTML, requestPointerLock, getClientRects, getBoundingClientRect, scrollIntoView, scroll, scrollTo, scrollBy, scrollIntoViewIfNeeded, animate, computedStyleMap, before, after, replaceWith, remove, prepend, append, querySelector, querySelectorAll, requestFullscreen, webkitRequestFullScreen, webkitRequestFullscreen, createShadowRoot, getDestinationInsertionPoints, elementTiming, ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE, CDATA_SECTION_NODE, ENTITY_REFERENCE_NODE, ENTITY_NODE, PROCESSING_INSTRUCTION_NODE, COMMENT_NODE, DOCUMENT_NODE, DOCUMENT_TYPE_NODE, DOCUMENT_FRAGMENT_NODE, NOTATION_NODE, DOCUMENT_POSITION_DISCONNECTED, DOCUMENT_POSITION_PRECEDING, DOCUMENT_POSITION_FOLLOWING, DOCUMENT_POSITION_CONTAINS, DOCUMENT_POSITION_CONTAINED_BY, DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC, nodeType, nodeName, baseURI, isConnected, ownerDocument, parentNode, parentElement, childNodes, firstChild, lastChild, previousSibling, nextSibling, nodeValue, textContent, hasChildNodes, getRootNode, normalize, cloneNode, isEqualNode, isSameNode, compareDocumentPosition, contains, lookupPrefix, lookupNamespaceURI, isDefaultNamespace, insertBefore, appendChild, replaceChild, removeChild, addEventListener, removeEventListener, dispatchEvent, "</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><a href="https://segmentfault.com/a/1190000017329980" target="_blank" rel="noopener">重绘和回流</a>（重排）</p>
+<p> <img src="https://image-static.segmentfault.com/408/885/4088852130-5afbe6c95934b_articlex" alt="webkit渲染过程"> </p>
+</li>
+</ul>
+<p>  如果重排就会改变上面那么多属性的值</p>
+<h2 id="虚拟dom的新建"><a href="#虚拟dom的新建" class="headerlink" title="虚拟dom的新建"></a>虚拟dom的新建</h2><h3 id="新建标签节点的虚拟dom"><a href="#新建标签节点的虚拟dom" class="headerlink" title="新建标签节点的虚拟dom"></a>新建标签节点的虚拟dom</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">createVnodeElement(tag, data, children = <span class="literal">null</span>) &#123;</span><br><span class="line">	<span class="keyword">let</span> flag;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> tag === <span class="string">'string'</span>) &#123;</span><br><span class="line">        flag = <span class="string">'html'</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span> tag === <span class="string">'function'</span>) &#123;</span><br><span class="line">        flag = <span class="string">'component'</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        flag = <span class="string">'text'</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">let</span> childrenFlag;</span><br><span class="line">    <span class="keyword">if</span>(children === <span class="literal">null</span>) &#123;</span><br><span class="line">        childrenFlag = <span class="string">'empty'</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(children)) &#123;</span><br><span class="line">        <span class="keyword">let</span> length = children.length;</span><br><span class="line">        <span class="keyword">if</span> (length === <span class="number">0</span>) &#123;</span><br><span class="line">            childrenFlag = <span class="string">'empty'</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            childrenFlag = <span class="string">'multiple'</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        childrenFlag = <span class="string">'single'</span>;</span><br><span class="line">        children = createTextVnode(children + <span class="string">''</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        flag,</span><br><span class="line">        tag,</span><br><span class="line">        data,</span><br><span class="line">        children,</span><br><span class="line">        childrenFlag</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="新建文本节点的虚拟dom"><a href="#新建文本节点的虚拟dom" class="headerlink" title="新建文本节点的虚拟dom"></a>新建文本节点的虚拟dom</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 新建文本类型虚拟dom</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createTextVnode</span>(<span class="params">text</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    flag: vnodeType.TEXT,</span><br><span class="line">    tag: <span class="literal">null</span>,</span><br><span class="line">    data: <span class="literal">null</span>,</span><br><span class="line">    children: text,</span><br><span class="line">    childrenFlag: childType.EMPTY</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="虚拟dom的调用"><a href="#虚拟dom的调用" class="headerlink" title="虚拟dom的调用"></a>虚拟dom的调用</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">vnode = createElement(<span class="string">'div'</span>, &#123;<span class="attr">id</span>: <span class="string">'test'</span>&#125;, [</span><br><span class="line">      createElement(<span class="number">123</span>)</span><br><span class="line">      createElement(<span class="string">'p'</span>, &#123;<span class="attr">key</span>: <span class="string">'a'</span>, <span class="attr">style</span>: &#123;<span class="attr">color</span>: <span class="string">'blue'</span>&#125;&#125;, <span class="string">'节点1'</span>),</span><br><span class="line">      createElement(<span class="string">'p'</span>, &#123;<span class="attr">key</span>: <span class="string">'b'</span>, <span class="string">'@click'</span>: <span class="function"><span class="params">()</span> =&gt;</span> &#123;alert(xx)&#125;&#125;, <span class="string">'节点2'</span>),</span><br><span class="line">      createElement(<span class="string">'p'</span>, &#123;<span class="attr">key</span>: <span class="string">'c'</span>, <span class="string">'class'</span>: <span class="string">'item-header'</span>&#125;, <span class="string">'节点3'</span>),</span><br><span class="line">      createElement(<span class="string">'p'</span>, &#123;<span class="attr">key</span>: <span class="string">'d'</span>&#125;, <span class="string">'节点4'</span>)</span><br><span class="line">    ])</span><br></pre></td></tr></table></figure>
+<h2 id="虚拟dom的渲染"><a href="#虚拟dom的渲染" class="headerlink" title="虚拟dom的渲染"></a>虚拟dom的渲染</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">render(vnode, <span class="built_in">document</span>.getElementById(<span class="string">'app'</span>))</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 渲染</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">render</span>(<span class="params">vnode, container</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (container.vnode) &#123;</span><br><span class="line">       patch(container.vnode, vnode, container)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  	   mount(vnode, container)</span><br><span class="line">    &#125;</span><br><span class="line">    container.vnode = vnode;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 首次挂载元素</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mount</span>(<span class="params">vnode, container</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> &#123;flag&#125; = vnode</span><br><span class="line">  <span class="comment">// 标签节点</span></span><br><span class="line">  <span class="keyword">if</span> (flag === <span class="string">'html'</span>) &#123;</span><br><span class="line">    mountElement(vnode, container)</span><br><span class="line">  <span class="comment">// 文本节点</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (flag === <span class="string">'text'</span>) &#123;</span><br><span class="line">    mountText(vnode, container)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="标签节点的属性挂载"><a href="#标签节点的属性挂载" class="headerlink" title="标签节点的属性挂载"></a>标签节点的属性挂载</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (data) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> key <span class="keyword">in</span> data) &#123;</span><br><span class="line">        <span class="comment">// 节点，名字，老值，新值</span></span><br><span class="line">        patchData(dom, key, <span class="literal">null</span>, data[key])</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="标签节点的子元素挂载"><a href="#标签节点的子元素挂载" class="headerlink" title="标签节点的子元素挂载"></a>标签节点的子元素挂载</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (childrenFlag !== childType.EMPTY) &#123;</span><br><span class="line">    <span class="keyword">if</span> (childrenFlag === childType.SINGLE) &#123;</span><br><span class="line">        mount(children, dom)</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childrenFlag === childType.MULTIPLE) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; children.length; i++) &#123;</span><br><span class="line">            mount(children[i], dom)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="虚拟dom核心：diff"><a href="#虚拟dom核心：diff" class="headerlink" title="虚拟dom核心：diff"></a>虚拟dom核心：diff</h2><p>这是另一位同学分享的<a href="http://10.199.140.56/book/part1/react/diff.html" target="_blank" rel="noopener">虚拟dom的diff算法浅析</a></p>
+<ul>
+<li>节点分标签节点和文本节点，所以需要flag来判断</li>
+<li>childrenFlag判断不同的子元素</li>
+<li>判断后进行不同形式的渲染</li>
+<li>难点：diff两个数组，例子：[axxbxxc] -&gt;  [cxxaxxb] ，虚拟dom从axxbxxc变为cxxaxxb，c一开始不需要移动位置，只管插入dom中，ab俩是按字母顺序所以b就不需要移动位置，但a到c后面了不是按字母顺序，所以需要移动位置。</li>
+<li>[abcd] -&gt; [acd]，react或vue的key对应list数组里每个元素，如果删掉一个b，还用index下标作为key的话，c会取代原来b的位置，这时候如果是选中c,效果就会变成d被选中，所以尽量不要用index作为key。</li>
+</ul>
+<p><a href="https://github.com/nameit/simple-vdom" target="_blank" rel="noopener">简易虚拟dom源码</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/vdom/" rel="tag">#vdom</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/前端/promise/" rel="prev">promise</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/前端/http-head/" rel="next">HTTP协议详解之消息报头篇</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+            </div>
+
+            
+
+            
+              <div class="comments" id="comments">
+                
+              </div>
+            
+        </div>
+
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="Yuki" itemprop="image">
+          <p class="site-author-name" itemprop="name">Yuki</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description"></p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟dom的样子"><span class="nav-number">1.</span> <span class="nav-text">虚拟dom的样子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是虚拟dom"><span class="nav-number">2.</span> <span class="nav-text">什么是虚拟dom</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#js操作原生dom为什么开销大"><span class="nav-number">3.</span> <span class="nav-text">js操作原生dom为什么开销大</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟dom的新建"><span class="nav-number">4.</span> <span class="nav-text">虚拟dom的新建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#新建标签节点的虚拟dom"><span class="nav-number">4.1.</span> <span class="nav-text">新建标签节点的虚拟dom</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新建文本节点的虚拟dom"><span class="nav-number">4.2.</span> <span class="nav-text">新建文本节点的虚拟dom</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟dom的调用"><span class="nav-number">5.</span> <span class="nav-text">虚拟dom的调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟dom的渲染"><span class="nav-number">6.</span> <span class="nav-text">虚拟dom的渲染</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#标签节点的属性挂载"><span class="nav-number">6.1.</span> <span class="nav-text">标签节点的属性挂载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#标签节点的子元素挂载"><span class="nav-number">6.2.</span> <span class="nav-text">标签节点的子元素挂载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟dom核心：diff"><span class="nav-number">7.</span> <span class="nav-text">虚拟dom核心：diff</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="copyright">
+  
+  &copy; &nbsp; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yuki</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT
+  </a>
+</div>
+
+
+
+        </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+</div>
+
+<script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+    
+
+  
+
+
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.4"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.4"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.4" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.4" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      if (isDesktop() && CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    });
+  </script>
+
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (CONFIG.sidebar === 'always') {
+            displaySidebar();
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+<!-- lazyload -->
+<script type="text/javascript" src="/js/lazyload.js"></script>
+<script type="text/javascript">
+    jQuery(function () {
+        jQuery("#posts img").lazyload({
+            placeholder: "/images/loading.gif",
+            effect: "fadeIn"
+        });
+    });
+</script>
+</body>
+</html>
